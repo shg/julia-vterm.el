@@ -46,7 +46,7 @@
     (define-key map (kbd "C-c C-z") #'inferior-julia-repl-vterm-switch-to-script-buffer)
     (define-key map (kbd "C-l") #'recenter-top-bottom)
     (define-key map (kbd "M-k") #'inferior-julia-repl-vterm-clear-buffer)
-    (define-key map (kbd "M-S-k") #'vterm-clear)
+    (define-key map (kbd "C-c C-t") #'inferior-julia-repl-vterm-copy-mode)
     map))
 
 (define-derived-mode inferior-julia-repl-vterm-mode vterm-mode "Inf-Julia"
@@ -83,8 +83,39 @@ already one with the process alive, just open it."
 (defun inferior-julia-repl-vterm-clear-buffer ()
   (interactive)
   (save-excursion
-    (recenter 0)
-    (vterm-clear-scrollback)))
+    (beginning-of-buffer)
+    (vterm-clear)))
+
+(defvar inferior-julia-repl-vterm-copy-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-t") #'inferior-julia-repl-vterm-copy-mode)
+    (define-key map [return] #'inferior-julia-repl-vterm-copy-mode-done)
+    (define-key map (kbd "RET") #'inferior-julia-repl-vterm-copy-mode-done)
+    (define-key map (kbd "C-c C-r") #'vterm-reset-cursor-point)
+    map))
+
+(define-minor-mode inferior-julia-repl-vterm-copy-mode
+  "Toggle copy mode."
+  :group 'inferior-julia-repl-vterm
+  :lighter " VTermCopy"
+  :keymap inferior-julia-repl-vterm-copy-mode-map
+  (when inferior-julia-repl-vterm-copy-mode
+    (message "Start copy mode")
+    (use-local-map nil)
+    (vterm-send-stop)))
+
+(defun inferior-julia-repl-vterm-copy-mode-done ()
+  "Save the active region to the kill ring and exit `inferior-julia-repl-vterm-copy-mode'."
+  (interactive)
+  (if (region-active-p)
+      (kill-ring-save (region-beginning) (region-end))
+    (user-error "No active region"))
+  (inferior-julia-repl-vterm-copy-mode -1)
+  (vterm-reset-cursor-point)
+  (use-local-map inferior-julia-repl-vterm-mode-map)
+  (vterm-send-start)
+  (message "End copy mode"))
+
 
 ;;----------------------------------------------------------------------
 (defgroup julia-with-repl-vterm nil
@@ -114,13 +145,23 @@ already one with the process alive, just open it."
     (julia-with-repl-vterm-send-string current-line))
   (forward-line))
 
+(defun julia-with-repl-vterm-send-buffer ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (let ((current-line (thing-at-point 'line t)))
+	(julia-with-repl-vterm-send-string current-line)
+	(forward-line)))))
+
 ;;;##autoload
 (define-minor-mode julia-with-repl-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
   nil "⁂"
   `((,(kbd "C-c C-z") . julia-with-repl-vterm-switch-to-repl-buffer)
+    (,(kbd "C-c C-b") . julia-with-repl-vterm-send-buffer)
     (,(kbd "C-<return>") . julia-with-repl-vterm-send-current-line)))
 
 (add-hook 'julia-mode-hook (lambda () (julia-with-repl-vterm-mode 1)))
 
-(provide 'julia-with-repl-vterm)
+(provide 'julia-repl-vterm)
