@@ -4,7 +4,7 @@
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; URL: https://github.com/shg/julia-repl-vterm
-;; Version: 0.1
+;; Version: 0.2
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -83,7 +83,7 @@ already one with the process alive, just open it."
 (defun inferior-julia-repl-vterm-clear-buffer ()
   (interactive)
   (save-excursion
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (vterm-clear)))
 
 (defvar inferior-julia-repl-vterm-copy-mode-map
@@ -148,11 +148,8 @@ already one with the process alive, just open it."
 (defun julia-with-repl-vterm-send-buffer ()
   (interactive)
   (save-excursion
-    (goto-char (point-min))
-    (while (not (eobp))
-      (let ((current-line (thing-at-point 'line t)))
-	(julia-with-repl-vterm-send-string current-line)
-	(forward-line)))))
+    (let ((repl-buffer (inferior-julia-repl-vterm-buffer)))
+      (julia-with-repl-vterm-send-string (buffer-string)))))
 
 ;;;##autoload
 (define-minor-mode julia-with-repl-vterm-mode
