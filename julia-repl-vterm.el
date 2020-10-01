@@ -4,7 +4,7 @@
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; URL: https://github.com/shg/julia-repl-vterm
-;; Version: 0.3
+;; Version: 0.4
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -135,20 +135,27 @@ already one with the process alive, just open it."
       (setq inferior-julia-repl-vterm-script-buffer current-script-buffer)
       (switch-to-buffer-other-window inferior-buffer))))
 
-(defun julia-with-repl-vterm-send-string (string)
+(defun julia-with-repl-vterm-send-return-key ()
   (with-current-buffer (inferior-julia-repl-vterm-buffer)
-    (vterm-send-string string)))
+    (vterm-send-return)))
+
+(defun julia-with-repl-vterm-paste-string (string)
+  (with-current-buffer (inferior-julia-repl-vterm-buffer)
+    (vterm-send-string string t)))
 
 (defun julia-with-repl-vterm-send-current-line ()
   (interactive)
-  (let ((current-line (thing-at-point 'line t)))
-    (julia-with-repl-vterm-send-string current-line))
+  (let ((current-char (char-after))
+        (current-line (string-trim (thing-at-point 'line t))))
+    (when (and current-char (not (string-empty-p current-line)))
+      (julia-with-repl-vterm-paste-string current-line)
+      (julia-with-repl-vterm-send-return-key)))
   (forward-line))
 
 (defun julia-with-repl-vterm-send-buffer ()
   (interactive)
   (save-excursion
-    (julia-with-repl-vterm-send-string (buffer-string))))
+    (julia-with-repl-vterm-paste-string (buffer-string))))
 
 ;;;##autoload
 (define-minor-mode julia-with-repl-vterm-mode
