@@ -1,0 +1,14 @@
+# -*- eval: (visual-line-mode 1) -*-
+#+STARTUP: showall
+
+* julia-repl-vterm-mode.el
+
+The julia-repl-vterm-mode.el provides a major-mode for inferior [[https://julialang.org/][Julia]] process that runs in vterm, and a minir-mode that adds some functions to interact with the inferior process to a [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] buffer.
+
+** Why?
+
+The [[https://github.com/tpapp/julia-repl][julia-repl]] works well in most cases, but I sometimes encountered problems, when I handle very large DataFrame, which seemed to be caused by the limited performance of term.el. I tested using [[https://github.com/akermu/emacs-libvterm][vterm]] and found the performance problems were resolved.
+
+** Should I use this?
+
+This code was initially developed for my personal use. It has only minimum functions that I need. I recommend any general users to use julia-repl instead. The julia-repl seems also going to support vterm soon.
