@@ -4,7 +4,7 @@
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; URL: https://github.com/shg/julia-repl-vterm
-;; Version: 0.4
+;; Version: 0.5
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
