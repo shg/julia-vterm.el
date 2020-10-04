@@ -152,6 +152,15 @@ already one with the process alive, just open it."
       (julia-with-repl-vterm-send-return-key)))
   (forward-line))
 
+(defun julia-with-repl-vterm-send-region-or-current-line ()
+  (interactive)
+  (if (use-region-p)
+      (progn
+        (julia-with-repl-vterm-paste-string (buffer-substring-no-properties
+                       (region-beginning) (region-end)))
+        (deactivate-mark))
+    (julia-with-repl-vterm-send-current-line)))
+
 (defun julia-with-repl-vterm-send-buffer ()
   (interactive)
   (save-excursion
@@ -163,7 +172,7 @@ already one with the process alive, just open it."
   nil "⁂"
   `((,(kbd "C-c C-z") . julia-with-repl-vterm-switch-to-repl-buffer)
     (,(kbd "C-c C-b") . julia-with-repl-vterm-send-buffer)
-    (,(kbd "C-<return>") . julia-with-repl-vterm-send-current-line)))
+    (,(kbd "C-<return>") . julia-with-repl-vterm-send-region-or-current-line)))
 
 (add-hook 'julia-mode-hook (lambda () (julia-with-repl-vterm-mode 1)))
 
