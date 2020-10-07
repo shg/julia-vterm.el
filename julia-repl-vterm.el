@@ -1,35 +1,39 @@
-;; julia-repl-vterm.el --- A mode for Julia REPL using vterm -*- lexical-binding: t -*-
-;;
+;;; julia-repl-vterm.el --- A mode for Julia REPL using vterm -*- lexical-binding: t -*-
+
 ;; Copyright (C) 2020 Shigeaki Nishina
+
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
-;; URL: https://github.com/shg/julia-repl-vterm
+;; Created: March 11, 2020
+;; URL: https://github.com/shg/julia-repl-vterm.el
 ;; Version: 0.6
-;;
+;; Keywords: languages, julia
+
 ;; This file is not part of GNU Emacs.
-;;
-;;; Commentary:
-;;
+
 ;;; License:
-;;
+
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or (at
 ;; your option) any later version.
-;;
+
 ;; This program is distributed in the hope that it will be useful, but
 ;; WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;; General Public License for more details.
-;;
+
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see https://www.gnu.org/licenses/.
-;;
+
+;;; Commentary:
+
 ;;; Code:
 
 (require 'julia-mode)
 (require 'vterm)
 
+
 ;;----------------------------------------------------------------------
 (defgroup inferior-julia-repl-vterm nil
   "A major mode for inferior Julia REPL"
@@ -116,7 +120,7 @@ already one with the process alive, just open it."
   (vterm-send-start)
   (message "End copy mode"))
 
-
+
 ;;----------------------------------------------------------------------
 (defgroup julia-with-repl-vterm nil
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
@@ -130,7 +134,7 @@ already one with the process alive, just open it."
 (defun julia-with-repl-vterm-switch-to-repl-buffer ()
   (interactive)
   (let ((current-script-buffer (current-buffer))
-        (inferior-buffer (inferior-julia-repl-vterm-buffer)))
+	(inferior-buffer (inferior-julia-repl-vterm-buffer)))
     (with-current-buffer inferior-buffer
       (setq inferior-julia-repl-vterm-script-buffer current-script-buffer)
       (switch-to-buffer-other-window inferior-buffer))))
@@ -162,9 +166,9 @@ already one with the process alive, just open it."
   (interactive)
   (if (use-region-p)
       (progn
-        (julia-with-repl-vterm-paste-string (buffer-substring-no-properties
-                       (region-beginning) (region-end)))
-        (deactivate-mark))
+	(julia-with-repl-vterm-paste-string
+	 (buffer-substring-no-properties (region-beginning) (region-end)))
+	(deactivate-mark))
     (julia-with-repl-vterm-send-current-line)))
 
 (defun julia-with-repl-vterm-send-buffer ()
@@ -183,3 +187,5 @@ already one with the process alive, just open it."
 (add-hook 'julia-mode-hook (lambda () (julia-with-repl-vterm-mode 1)))
 
 (provide 'julia-repl-vterm)
+
+;;; julia-repl-vterm.el ends here
