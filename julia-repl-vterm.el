@@ -4,7 +4,7 @@
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; URL: https://github.com/shg/julia-repl-vterm
-;; Version: 0.5
+;; Version: 0.6
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -145,11 +145,17 @@ already one with the process alive, just open it."
 
 (defun julia-with-repl-vterm-send-current-line ()
   (interactive)
-  (let ((current-char (char-after))
-        (current-line (string-trim (thing-at-point 'line t))))
-    (when (and current-char (not (string-empty-p current-line)))
-      (julia-with-repl-vterm-paste-string current-line)
-      (julia-with-repl-vterm-send-return-key)))
+  (save-excursion
+    (end-of-line)
+    (let ((clmn (current-column))
+	  (char (char-after))
+	  (line (string-trim (thing-at-point 'line t))))
+      (unless (and (zerop clmn) char)
+	(when (/= 0 clmn)
+	  (julia-with-repl-vterm-paste-string line)
+	  (julia-with-repl-vterm-send-return-key)
+	  (if (not char)
+	      (newline))))))
   (forward-line))
 
 (defun julia-with-repl-vterm-send-region-or-current-line ()
