@@ -6,7 +6,7 @@
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-repl-vterm.el
-;; Version: 0.6
+;; Version: 0.7
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -88,7 +88,7 @@ already one with the process alive, just open it."
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (vterm-clear)))
+    (vterm-clear 1)))
 
 (defvar inferior-julia-repl-vterm-copy-mode-map
   (let ((map (make-sparse-keymap)))
