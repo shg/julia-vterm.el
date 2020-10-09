@@ -19,7 +19,7 @@ Install [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[
 (package-install-file "/path-to-download-dir/julia-repl-vterm.el")
 #+END_SRC
 
-Evaluate the following line to turn on julia-with-repl-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with an inferior Julia REPL process. Add this line to your init file to enable it in future sessions.
+Next, evaluate the following add-hook line to turn on julia-with-repl-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with the vterm-powered Julia REPL. Add this line to your init file to enable this in future sessions.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'julia-mode-hook #'julia-with-repl-vterm-mode)
