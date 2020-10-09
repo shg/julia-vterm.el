@@ -17,16 +17,40 @@
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or (at
 ;; your option) any later version.
-
+;;
 ;; This program is distributed in the hope that it will be useful, but
 ;; WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;; General Public License for more details.
-
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see https://www.gnu.org/licenses/.
 
 ;;; Commentary:
+
+;; Provides a major-mode for inferior Julia process that runs in vterm, and a
+;; minor-mode that extends julia-mode to support interaction with the inferior
+;; Julia process.
+
+;;; Usage:
+
+;; You must have julia-mode and vterm installed.
+;; Install julia-repl-vterm.el manually using package.el
+;;
+;;   (package-install-file "/path-to-download-dir/julia-repl-vterm.el")
+;;
+;; Eval the following line. Add this line to your init file to enable this
+;; mode in future sessions.
+;;
+;;   (add-hook 'julia-mode-hook #'julia-with-repl-vterm-mode)
+;;
+;; Now you can interact with an inferior Julia REPL from a Julia buffer.
+;;
+;; C-c C-z in a julia-mode buffer to open an inferior Julia REPL buffer.
+;; C-c C-z in the REPL buffer to switch back to the script buffer.
+;; C-<return> in the script buffer to send region or current line to REPL.
+;;
+;; See the code below for a few more key bidindings.
 
 ;;; Code:
 
@@ -57,10 +81,11 @@
   :group 'inferior-julia-repl-vterm)
 
 (defun inferior-julia-repl-vterm-buffer ()
-  "Return the inferior Julia REPL buffer `*julia-repl*`. If the buffer doesn't exist,
-create one and return it. If there's already the buffer and the inferior Julia REPL
-is running, return the buffer. If the buffer exists but the process is not running,
-kill the buffer and create a new one."
+  "Return the inferior Julia REPL buffer `*julia-repl*`.
+If the buffer doesn't exist, create one and return it.  If there's already the
+buffer and the inferior Julia REPL is running, return the buffer.  If the
+buffer exists but the process is not running, kill the buffer and create a new
+one."
   (if-let ((buffer (get-buffer inferior-julia-repl-vterm-buffer-name))
 	   (proc (with-current-buffer buffer vterm--process)))
       buffer
@@ -72,18 +97,20 @@ kill the buffer and create a new one."
       buffer)))
 
 (defun inferior-julia-repl-vterm ()
-  "Create an inferior Julia REPL buffer `*julia-repl*` and open it. If there's
-already one with the process alive, just open it."
+  "Create an inferior Julia REPL buffer `*julia-repl*` and open it.
+If there's already one with the process alive, just open it."
   (interactive)
   (pop-to-buffer-same-window (inferior-julia-repl-vterm-buffer)))
 
 (defun inferior-julia-repl-vterm-switch-to-script-buffer ()
+  "Switch to the script buffer that opened this Julia REPL buffer."
   (interactive)
   (if (and (boundp 'inferior-julia-repl-vterm-script-buffer) (buffer-live-p inferior-julia-repl-vterm-script-buffer))
       (switch-to-buffer-other-window inferior-julia-repl-vterm-script-buffer)
     (message "The script buffer does not exist.")))
 
 (defun inferior-julia-repl-vterm-clear-buffer ()
+  "Clear the content of the Julia REPL buffer."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -108,7 +135,7 @@ already one with the process alive, just open it."
     (vterm-send-stop)))
 
 (defun inferior-julia-repl-vterm-copy-mode-done ()
-  "Save the active region to the kill ring and exit `inferior-julia-repl-vterm-copy-mode'."
+  "Save the active region to the kill ring and exit copy mode."
   (interactive)
   (if (region-active-p)
       (kill-ring-save (region-beginning) (region-end))
@@ -122,15 +149,18 @@ already one with the process alive, just open it."
 
 ;;----------------------------------------------------------------------
 (defgroup julia-with-repl-vterm nil
-  "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
+  "A minor mode for a Julia script buffer that interacts with an inferior Julia
+REPL."
   :group 'julia)
 
 (defcustom julia-with-repl-vterm-hook nil
-  "Hook to run after starting a Julia script buffer that interacts with an inferior Julia REPL."
+  "Hook to run after starting a Julia script buffer that interacts with an
+inferior Julia REPL."
   :type 'hook
   :group 'julia-with-repl-vterm)
 
 (defun julia-with-repl-vterm-switch-to-repl-buffer ()
+  "Switch to the REPL buffer if one already exists, or open a new REPL buffer."
   (interactive)
   (let ((current-script-buffer (current-buffer))
 	(inferior-buffer (inferior-julia-repl-vterm-buffer)))
@@ -139,14 +169,20 @@ already one with the process alive, just open it."
       (switch-to-buffer-other-window inferior-buffer))))
 
 (defun julia-with-repl-vterm-send-return-key ()
+  "Send a return key to the Julia REPL buffer."
   (with-current-buffer (inferior-julia-repl-vterm-buffer)
     (vterm-send-return)))
 
 (defun julia-with-repl-vterm-paste-string (string)
+  "Send STRING to the Julia REPL buffer using brackted paste mode."
   (with-current-buffer (inferior-julia-repl-vterm-buffer)
     (vterm-send-string string t)))
 
 (defun julia-with-repl-vterm-send-current-line ()
+  "Send the current line to the Julia REPL buffer, and move to the next line.
+This sends a newline after the content of the current line even if there's no
+newline at the end.  A newline is also inserted after the current line of the
+script buffer."
   (interactive)
   (save-excursion
     (end-of-line)
@@ -162,6 +198,7 @@ already one with the process alive, just open it."
   (forward-line))
 
 (defun julia-with-repl-vterm-send-region-or-current-line ()
+  "Send the content of region if region is active, or send the current line."
   (interactive)
   (if (use-region-p)
       (progn
@@ -171,6 +208,7 @@ already one with the process alive, just open it."
     (julia-with-repl-vterm-send-current-line)))
 
 (defun julia-with-repl-vterm-send-buffer ()
+  "Send the whole content of the script buffer to the Julia REPL buffer."
   (interactive)
   (save-excursion
     (julia-with-repl-vterm-paste-string (buffer-string))))
