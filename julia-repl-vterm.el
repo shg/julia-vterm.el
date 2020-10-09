@@ -6,7 +6,7 @@
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-repl-vterm.el
-;; Version: 0.7
+;; Version: 0.7a
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -176,7 +176,7 @@ already one with the process alive, just open it."
   (save-excursion
     (julia-with-repl-vterm-paste-string (buffer-string))))
 
-;;;##autoload
+;;;###autoload
 (define-minor-mode julia-with-repl-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
   nil "⁂"
