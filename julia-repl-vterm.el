@@ -150,13 +150,11 @@ If there's already one with the process alive, just open it."
 
 ;;----------------------------------------------------------------------
 (defgroup julia-with-repl-vterm nil
-  "A minor mode for a Julia script buffer that interacts with an inferior Julia
-REPL."
+  "A minor mode to interact with an inferior Julia REPL."
   :group 'julia)
 
 (defcustom julia-with-repl-vterm-hook nil
-  "Hook to run after starting a Julia script buffer that interacts with an
-inferior Julia REPL."
+  "Hook run after starting a Julia script buffer with an inferior Julia REPL."
   :type 'hook
   :group 'julia-with-repl-vterm)
 
