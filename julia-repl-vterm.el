@@ -6,7 +6,7 @@
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-repl-vterm.el
-;; Version: 0.7a
+;; Version: 0.8
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -30,7 +30,6 @@
 
 ;;; Code:
 
-(require 'julia-mode)
 (require 'vterm)
 
 
@@ -183,8 +182,6 @@ already one with the process alive, just open it."
   `((,(kbd "C-c C-z") . julia-with-repl-vterm-switch-to-repl-buffer)
     (,(kbd "C-c C-b") . julia-with-repl-vterm-send-buffer)
     (,(kbd "C-<return>") . julia-with-repl-vterm-send-region-or-current-line)))
-
-(add-hook 'julia-mode-hook (lambda () (julia-with-repl-vterm-mode 1)))
 
 (provide 'julia-repl-vterm)
 
