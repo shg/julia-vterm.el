@@ -7,9 +7,9 @@ The julia-repl-vterm.el provides a major-mode for inferior Julia process that ru
 
 ** Should I use this?
 
-There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used very large DataFrame, which seemed to be caused by the limited performance of term.el. I wrote this simple REPL mode using vterm and found the performance problems were resolved.
+There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used very large DataFrame, which seemed to be caused by the limited performance of term.el. I wrote julia-repl-vterm.el using vterm and now REPL works as smoothly as in a native terminal.
 
-This code has the minimum functions that suffice my use. For most general users, julia-repl may be the better choice. The julia-repl seems also going to [[https://github.com/tpapp/julia-repl/pull/84][support vterm]] soon.
+This code has the minimum functions that suffice my use. You may want to check julia-repl if you need more features. If this simplicity fits your preference, please give it a try!
 
 ** Installation
 
