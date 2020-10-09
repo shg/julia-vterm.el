@@ -6,6 +6,7 @@
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-repl-vterm.el
+;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
 ;; Version: 0.8
 ;; Keywords: languages, julia
 
