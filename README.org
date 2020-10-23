@@ -1,56 +1,56 @@
 # -*- eval: (visual-line-mode 1) -*-
 #+STARTUP: showall
 
-* julia-repl-vterm.el
+* julia-vterm.el
 
-The julia-repl-vterm.el provides a major-mode for inferior Julia process that runs in vterm, and a minor-mode that extends julia-mode for interaction with the inferior Julia process.
+The julia-vterm.el provides a major-mode for inferior Julia process that runs in vterm, and a minor-mode that extends julia-mode for interaction with the inferior Julia process.
 
 ** Should I use this?
 
-There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used very large DataFrame, which seemed to be caused by the limited performance of term.el. I wrote julia-repl-vterm.el using vterm and now REPL works as smoothly as in a native terminal.
+There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used very large DataFrame, which seemed to be caused by the limited performance of term.el. I wrote julia-vterm.el using vterm and now REPL works as smoothly as in a native terminal.
 
 This code has the minimum functions that suffice my use. You may want to check julia-repl if you need more features. If this simplicity fits your preference, please give it a try!
 
 ** Installation
 
-Install [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] first. Download [[https://raw.githubusercontent.com/shg/julia-repl-vterm.el/master/julia-repl-vterm.el][julia-repl-vterm.el]] into somewhere in your local directory and install it with the following.
+Install [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] first. Download [[https://raw.githubusercontent.com/shg/julia-repl-vterm.el/master/julia-repl-vterm.el][julia-vterm.el]] into somewhere in your local directory and install it with the following.
 
 #+BEGIN_SRC emacs-lisp
-(package-install-file "/path-to-download-dir/julia-repl-vterm.el")
+(package-install-file "/path-to-download-dir/julia-vterm.el")
 #+END_SRC
 
-Next, evaluate the following add-hook line to turn on julia-with-repl-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with the vterm-powered Julia REPL. Add this line to your init file to enable this in future sessions.
+Next, evaluate the following add-hook line to turn on julia-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with the vterm-powered Julia REPL. Add this line to your init file to enable this in future sessions.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'julia-mode-hook #'julia-with-repl-vterm-mode)
+(add-hook 'julia-mode-hook #'julia-vterm-mode)
 #+END_SRC
 
 ** How to use
 
-In a julia-mode buffer, =M-x inferior-julia-repl-vterm-switch-to-script-buffer= (or =C-c C-z=) to open an inferior Julia REPL buffer associated with the julia-mode buffer.
+In a julia-mode buffer, =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=) to open an inferior Julia REPL buffer associated with the julia-mode buffer.
 
 ** Key bindings
 
-*** =julia-mode= with =julia-with-repl-vterm-mode= enabled
+*** =julia-mode= with =julia-vterm-mode= enabled
 
-| Key        | Binding                                           |
-|------------+---------------------------------------------------|
-| =C-c C-z=    | =julia-with-repl-vterm-switch-to-repl-buffer=       |
-| =C-<return>= | =julia-with-repl-vterm-send-region-or-current-line= |
-| =C-c C-b=    | =julia-with-repl-vterm-send-buffer=                 |
+| Key        | Binding                                       |
+|------------+-----------------------------------------------|
+| =C-c C-z=    | =julia-vterm-switch-to-repl-buffer=       |
+| =C-<return>= | =julia-vterm-send-region-or-current-line= |
+| =C-c C-b=    | =julia-vterm-send-buffer=                 |
 
-*** =inferior-julia-repl-vterm-mode=
+*** =julia-vterm-repl-mode=
 
-| Key     | Binding                                           |
-|---------+---------------------------------------------------|
-| =C-c C-z= | =inferior-julia-repl-vterm-switch-to-script-buffer= |
-| =M-k=     | =inferior-julia-repl-vterm-clear-buffer=            |
-| =C-c C-t= | =inferior-julia-repl-vterm-copy-mode=               |
+| Key     | Binding                                  |
+|---------+------------------------------------------|
+| =C-c C-z= | =julia-vterm-repl-switch-to-script-buffer= |
+| =M-k=     | =julia-vterm-repl-clear-buffer=            |
+| =C-c C-t= | =julia-vterm-repl-copy-mode=               |
 
-*** =inferior-julia-repl-vterm-mode= (copy mode)
+*** =julia-vterm-repl-mode= (copy mode)
 
-| Key      | Binding                                  |
-|----------+------------------------------------------|
-| =C-c C-t=  | =inferior-julia-repl-vterm-copy-mode=      |
-| =<return>= | =inferior-julia-repl-vterm-copy-mode-done= |
-| =C-c C-r=  | =vterm-reset-cursor-point=                 |
+| Key      | Binding                         |
+|----------+---------------------------------|
+| =C-c C-t=  | =julia-vterm-repl-copy-mode=      |
+| =<return>= | =julia-vterm-repl-copy-mode-done= |
+| =C-c C-r=  | =vterm-reset-cursor-point=        |
