@@ -23,7 +23,7 @@ Then, evaluate the following add-hook line to turn on julia-vterm-mode in newly 
 (add-hook 'julia-mode-hook #'julia-vterm-mode)
 #+END_SRC
 
-You can install the package manually if necessary. First make sure  [[https://github.com/JuliaEditoraSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download [[https://raw.githubusercontent.com/shg/julia-repl-vterm.el/master/julia-repl-vterm.el][julia-vterm.el]] into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
+You can install the package manually if necessary. First make sure  [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download =julia-vterm.el= into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
 
 #+BEGIN_SRC emacs-lisp
 (package-install-file "/path-to-download-dir/julia-vterm.el")
