@@ -23,7 +23,7 @@ Then, evaluate the following add-hook line to turn on julia-vterm-mode in newly 
 (add-hook 'julia-mode-hook #'julia-vterm-mode)
 #+END_SRC
 
-You can install the package manually if necessary. First make sure  [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download =julia-vterm.el= into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
+You can install the package manually if necessary. First make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download =julia-vterm.el= into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
 
 #+BEGIN_SRC emacs-lisp
 (package-install-file "/path-to-download-dir/julia-vterm.el")
@@ -37,11 +37,12 @@ In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Ju
 
 *** =julia-mode= with =julia-vterm-mode= enabled
 
-| Key        | Binding                                       |
-|------------+-----------------------------------------------|
+| Key        | Binding                                 |
+|------------+-----------------------------------------|
 | =C-c C-z=    | =julia-vterm-switch-to-repl-buffer=       |
 | =C-<return>= | =julia-vterm-send-region-or-current-line= |
 | =C-c C-b=    | =julia-vterm-send-buffer=                 |
+| =C-c C-i=    | =julia-vterm-send-include-buffer-file=    |
 
 *** =julia-vterm-repl-mode=
 

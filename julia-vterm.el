@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.10
+;; Version: 0.10a
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -168,7 +168,7 @@ If there's already one with the process alive, just open it."
       (switch-to-buffer-other-window inferior-buffer))))
 
 (defun julia-vterm-send-return-key ()
-  "Send a return key to the Julia REPL buffer."
+  "Send a return key to the Julia REPL."
   (with-current-buffer (julia-vterm-repl-buffer)
     (vterm-send-return)))
 
@@ -178,7 +178,7 @@ If there's already one with the process alive, just open it."
     (vterm-send-string string t)))
 
 (defun julia-vterm-send-current-line ()
-  "Send the current line to the Julia REPL buffer, and move to the next line.
+  "Send the current line to the Julia REPL, and move to the next line.
 This sends a newline after the content of the current line even if there's no
 newline at the end.  A newline is also inserted after the current line of the
 script buffer."
@@ -197,7 +197,7 @@ script buffer."
   (forward-line))
 
 (defun julia-vterm-send-region-or-current-line ()
-  "Send the content of region if region is active, or send the current line."
+  "Send the content of the region if the region is active, or send the current line."
   (interactive)
   (if (use-region-p)
       (progn
@@ -207,10 +207,21 @@ script buffer."
     (julia-vterm-send-current-line)))
 
 (defun julia-vterm-send-buffer ()
-  "Send the whole content of the script buffer to the Julia REPL buffer."
+  "Send the whole content of the script buffer to the Julia REPL line by line."
   (interactive)
   (save-excursion
     (julia-vterm-paste-string (buffer-string))))
+
+(defun julia-vterm-send-include-buffer-file (&optional arg)
+  "Send a line to evaluate the buffer's file using include() to the Julia REPL.
+With a prefix argument ARG (or interactively C-u), use Revise.includet() instead."
+  (interactive "P")
+  (let ((fmt (if arg "Revise.includet(\"%s\")\n" "include(\"%s\")\n")))
+    (if (and buffer-file-name
+	     (file-exists-p buffer-file-name)
+	     (not (buffer-modified-p)))
+	(julia-vterm-paste-string (format fmt buffer-file-name))
+      (message "The buffer must be saved in a file to include."))))
 
 ;;;###autoload
 (define-minor-mode julia-vterm-mode
@@ -218,7 +229,8 @@ script buffer."
   nil "⁂"
   `((,(kbd "C-c C-z") . julia-vterm-switch-to-repl-buffer)
     (,(kbd "C-<return>") . julia-vterm-send-region-or-current-line)
-    (,(kbd "C-c C-b") . julia-vterm-send-buffer)))
+    (,(kbd "C-c C-b") . julia-vterm-send-buffer)
+    (,(kbd "C-c C-i") . julia-vterm-send-include-buffer-file)))
 
 (provide 'julia-vterm)
 
