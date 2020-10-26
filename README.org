@@ -1,33 +1,37 @@
 # -*- eval: (visual-line-mode 1) -*-
 #+STARTUP: showall
 
-* julia-vterm.el
+[[https://melpa.org/#/julia-vterm][file:https://melpa.org/packages/julia-vterm-badge.svg]] [[https://stable.melpa.org/#/julia-vterm][file:https://stable.melpa.org/packages/julia-vterm-badge.svg]]
 
-The julia-vterm.el provides a major-mode for inferior Julia process that runs in vterm, and a minor-mode that extends julia-mode for interaction with the inferior Julia process.
+* julia-vterm
+
+Julia-vterm provides a major-mode for inferior Julia process that runs in vterm, and a minor-mode that extends julia-mode with the ability to interact with the inferior Julia process.
 
 ** Should I use this?
 
-There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used very large DataFrame, which seemed to be caused by the limited performance of term.el. I wrote julia-vterm.el using vterm and now REPL works as smoothly as in a native terminal.
+There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used a very large DataFrame, which seemed to be caused by the limited performance of term.el. Julia-vterm is implemented using emacs-libvterm, and REPL works as smoothly as in a native terminal.
 
-This code has the minimum functions that suffice my use. You may want to check julia-repl if you need more features. If this simplicity fits your preference, please give it a try!
+Currently, julia-vterm offers minimum functionalities for basic interaction with the REPL. A few more functions may be added in the future, but you may want to check julia-repl if you need more features. If the simplicity of this package fits your preference, please give it a try!
 
 ** Installation
 
-Install [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] first. Download [[https://raw.githubusercontent.com/shg/julia-repl-vterm.el/master/julia-repl-vterm.el][julia-vterm.el]] into somewhere in your local directory and install it with the following.
+Just install it from MELPA. The package name is =julia-vterm=.
 
-#+BEGIN_SRC emacs-lisp
-(package-install-file "/path-to-download-dir/julia-vterm.el")
-#+END_SRC
-
-Next, evaluate the following add-hook line to turn on julia-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with the vterm-powered Julia REPL. Add this line to your init file to enable this in future sessions.
+Then, evaluate the following add-hook line to turn on julia-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with the vterm-powered Julia REPL. Add this line to your init file to enable julia-vterm-mode in future sessions.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'julia-mode-hook #'julia-vterm-mode)
 #+END_SRC
 
+You can install the package manually if necessary. First make sure  [[https://github.com/JuliaEditoraSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download [[https://raw.githubusercontent.com/shg/julia-repl-vterm.el/master/julia-repl-vterm.el][julia-vterm.el]] into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
+
+#+BEGIN_SRC emacs-lisp
+(package-install-file "/path-to-download-dir/julia-vterm.el")
+#+END_SRC
+
 ** How to use
 
-In a julia-mode buffer, =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=) to open an inferior Julia REPL buffer associated with the julia-mode buffer.
+In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Julia REPL buffer with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=).
 
 ** Key bindings
 
