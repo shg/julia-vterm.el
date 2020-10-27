@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.10a
+;; Version: 0.10b
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -223,6 +223,16 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
 	(julia-vterm-paste-string (format fmt buffer-file-name))
       (message "The buffer must be saved in a file to include."))))
 
+(defun julia-vterm-send-cd-to-buffer-directory ()
+  "Send cd() function call to the Julia REPL to change the current working directory of REPL to the buffer's directory."
+  (interactive)
+  (if buffer-file-name
+      (let ((buffer-directory (file-name-directory buffer-file-name)))
+	(julia-vterm-paste-string (format "cd(\"%s\")\n" buffer-directory))
+	(with-current-buffer (julia-vterm-repl-buffer)
+	  (setq default-directory buffer-directory)))
+    (message "The buffer is not associated with a directory.")))
+
 ;;;###autoload
 (define-minor-mode julia-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
@@ -230,7 +240,8 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
   `((,(kbd "C-c C-z") . julia-vterm-switch-to-repl-buffer)
     (,(kbd "C-<return>") . julia-vterm-send-region-or-current-line)
     (,(kbd "C-c C-b") . julia-vterm-send-buffer)
-    (,(kbd "C-c C-i") . julia-vterm-send-include-buffer-file)))
+    (,(kbd "C-c C-i") . julia-vterm-send-include-buffer-file)
+    (,(kbd "C-c C-d") . julia-vterm-send-cd-to-buffer-directory)))
 
 (provide 'julia-vterm)
 

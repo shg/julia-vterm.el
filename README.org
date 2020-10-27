@@ -43,6 +43,7 @@ In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Ju
 | =C-<return>= | =julia-vterm-send-region-or-current-line= |
 | =C-c C-b=    | =julia-vterm-send-buffer=                 |
 | =C-c C-i=    | =julia-vterm-send-include-buffer-file=    |
+| C-c C-d    | julia-vterm-send-cd-to-buffer-directory |
 
 *** =julia-vterm-repl-mode=
 
