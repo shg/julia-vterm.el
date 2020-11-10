@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.10b
+;; Version: 0.10c
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -60,10 +60,8 @@
 
 ;;----------------------------------------------------------------------
 (defgroup julia-vterm-repl nil
-  "A major mode for inferior Julia REPL"
+  "A major mode for inferior Julia REPL."
   :group 'julia)
-
-(defvar julia-vterm-repl-buffer-name "*julia-repl*")
 
 (defvar julia-vterm-repl-program "julia")
 
@@ -81,34 +79,60 @@
   "A major mode for inferior Julia REPL."
   :group 'julia-vterm-repl)
 
-(defun julia-vterm-repl-buffer ()
-  "Return the inferior Julia REPL buffer `*julia-repl*`.
-If the buffer doesn't exist, create one and return it.  If there's already the
-buffer and the inferior Julia REPL is running, return the buffer.  If the
-buffer exists but the process is not running, kill the buffer and create a new
-one."
-  (if-let ((buffer (get-buffer julia-vterm-repl-buffer-name))
-	   (proc (with-current-buffer buffer vterm--process)))
+(defun julia-vterm-repl-buffer-name (&optional session-name)
+  "Return a Julia REPL buffer name whose session name is SESSION-NAME."
+  (format "*julia:%s*" (if session-name session-name "main")))
+
+(defun julia-vterm-repl-session-name (repl-buffer)
+  "Return the session name of REPL-BUFFER."
+  (let ((bn (buffer-name repl-buffer)))
+    (if (string= (substring bn 1 7) "julia:")
+	(substring bn 7 -1)
+      nil)))
+
+(defun julia-vterm-repl-buffer-with-session-name (session-name &optional restart)
+  "Return an inferior Julia REPL buffer of the session name SESSION-NAME.
+If there exists no such buffer, one is created and returned.
+With non-nil RESTART, the existing buffer will be killed and
+recreated."
+  (if-let ((buffer (get-buffer (julia-vterm-repl-buffer-name session-name)))
+	   (proc (with-current-buffer buffer vterm--process))
+	   (no-restart (not restart)))
       buffer
+    (if (get-buffer-process buffer) (delete-process buffer))
     (if buffer (kill-buffer buffer))
-    (let ((buffer (generate-new-buffer julia-vterm-repl-buffer-name))
+    (let ((buffer (generate-new-buffer (julia-vterm-repl-buffer-name session-name)))
 	  (vterm-shell julia-vterm-repl-program))
       (with-current-buffer buffer
 	(julia-vterm-repl-mode))
       buffer)))
 
+(defun julia-vterm-repl-buffer (&optional session-name restart)
+  "Return an inferior Julia REPL buffer.
+The main REPL buffer will be returned if SESSION-NAME is not
+given.  If non-nil RESTART is given, the REPL buffer will be
+recreated even when a process is alive and running in the buffer."
+  (if session-name
+      (julia-vterm-repl-buffer-with-session-name session-name restart)
+    (julia-vterm-repl-buffer-with-session-name "main" restart)))
+
 (defun julia-vterm-repl ()
-  "Create an inferior Julia REPL buffer `*julia-repl*` and open it.
+  "Create an inferior Julia REPL buffer `*julia:main*` and open it.
 If there's already one with the process alive, just open it."
   (interactive)
   (pop-to-buffer-same-window (julia-vterm-repl-buffer)))
 
 (defun julia-vterm-repl-switch-to-script-buffer ()
-  "Switch to the script buffer that opened this Julia REPL buffer."
+  "Switch to the script buffer that is paired with this Julia REPL buffer."
   (interactive)
-  (if (and (boundp 'julia-vterm-repl-script-buffer) (buffer-live-p julia-vterm-repl-script-buffer))
-      (switch-to-buffer-other-window julia-vterm-repl-script-buffer)
-    (message "The script buffer does not exist.")))
+  (let ((repl-buffer (current-buffer))
+	(script-buffer (if (buffer-live-p julia-vterm-repl-script-buffer)
+			   julia-vterm-repl-script-buffer
+			 nil)))
+    (if script-buffer
+	(with-current-buffer script-buffer
+	  (setq julia-vterm-fellow-repl-buffer repl-buffer)
+	  (switch-to-buffer-other-window script-buffer)))))
 
 (defun julia-vterm-repl-clear-buffer ()
   "Clear the content of the Julia REPL buffer."
@@ -158,23 +182,38 @@ If there's already one with the process alive, just open it."
   :type 'hook
   :group 'julia-vterm)
 
-(defun julia-vterm-switch-to-repl-buffer ()
-  "Switch to the REPL buffer if one already exists, or open a new REPL buffer."
-  (interactive)
-  (let ((current-script-buffer (current-buffer))
-	(inferior-buffer (julia-vterm-repl-buffer)))
-    (with-current-buffer inferior-buffer
-      (setq julia-vterm-repl-script-buffer current-script-buffer)
-      (switch-to-buffer-other-window inferior-buffer))))
+(defvar-local julia-vterm-fellow-repl-buffer nil)
+
+(defun julia-vterm-fellow-repl-buffer (&optional session-name)
+  "Return the paired REPL buffer or the one specified with SESSION-NAME."
+  (if session-name
+      (julia-vterm-repl-buffer session-name)
+    (if (buffer-live-p julia-vterm-fellow-repl-buffer)
+	julia-vterm-fellow-repl-buffer
+      (julia-vterm-repl-buffer))))
+
+(defun julia-vterm-switch-to-repl-buffer (&optional prefix)
+  "Switch to the paired REPL buffer or to the one with a specified session name.
+With PREFIX, prompt for session name."
+  (interactive "P")
+  (let* ((session-name
+	  (cond ((null prefix) nil)
+		(t (read-from-minibuffer "Session name: "))))
+	 (script-buffer (current-buffer))
+	 (repl-buffer (julia-vterm-fellow-repl-buffer session-name)))
+    (setq julia-vterm-fellow-repl-buffer repl-buffer )
+    (with-current-buffer repl-buffer
+      (setq julia-vterm-repl-script-buffer script-buffer)
+      (switch-to-buffer-other-window repl-buffer))))
 
 (defun julia-vterm-send-return-key ()
   "Send a return key to the Julia REPL."
-  (with-current-buffer (julia-vterm-repl-buffer)
+  (with-current-buffer (julia-vterm-fellow-repl-buffer)
     (vterm-send-return)))
 
 (defun julia-vterm-paste-string (string)
   "Send STRING to the Julia REPL buffer using brackted paste mode."
-  (with-current-buffer (julia-vterm-repl-buffer)
+  (with-current-buffer (julia-vterm-fellow-repl-buffer)
     (vterm-send-string string t)))
 
 (defun julia-vterm-send-current-line ()
@@ -229,7 +268,7 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
   (if buffer-file-name
       (let ((buffer-directory (file-name-directory buffer-file-name)))
 	(julia-vterm-paste-string (format "cd(\"%s\")\n" buffer-directory))
-	(with-current-buffer (julia-vterm-repl-buffer)
+	(with-current-buffer (julia-vterm-fellow-repl-buffer)
 	  (setq default-directory buffer-directory)))
     (message "The buffer is not associated with a directory.")))
 
