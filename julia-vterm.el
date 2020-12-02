@@ -211,9 +211,9 @@ With PREFIX, prompt for session name."
   (with-current-buffer (julia-vterm-fellow-repl-buffer)
     (vterm-send-return)))
 
-(defun julia-vterm-paste-string (string)
+(defun julia-vterm-paste-string (string &optional session-name)
   "Send STRING to the Julia REPL buffer using brackted paste mode."
-  (with-current-buffer (julia-vterm-fellow-repl-buffer)
+  (with-current-buffer (julia-vterm-fellow-repl-buffer session-name)
     (vterm-send-string string t)))
 
 (defun julia-vterm-send-current-line ()
