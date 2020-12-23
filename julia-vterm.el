@@ -154,10 +154,15 @@ If there's already one with the process alive, just open it."
   :group 'julia-vterm-repl
   :lighter " VTermCopy"
   :keymap julia-vterm-repl-copy-mode-map
-  (when julia-vterm-repl-copy-mode
-    (message "Start copy mode")
-    (use-local-map nil)
-    (vterm-send-stop)))
+  (if julia-vterm-repl-copy-mode
+      (progn
+	(message "Start copy mode")
+	(use-local-map nil)
+	(vterm-send-stop))
+    (vterm-reset-cursor-point)
+    (use-local-map julia-vterm-repl-mode-map)
+    (vterm-send-start)
+    (message "End copy mode")))
 
 (defun julia-vterm-repl-copy-mode-done ()
   "Save the active region to the kill ring and exit copy mode."
@@ -165,11 +170,7 @@ If there's already one with the process alive, just open it."
   (if (region-active-p)
       (kill-ring-save (region-beginning) (region-end))
     (user-error "No active region"))
-  (julia-vterm-repl-copy-mode -1)
-  (vterm-reset-cursor-point)
-  (use-local-map julia-vterm-repl-mode-map)
-  (vterm-send-start)
-  (message "End copy mode"))
+  (julia-vterm-repl-copy-mode -1))
 
 
 ;;----------------------------------------------------------------------
