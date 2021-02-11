@@ -9,7 +9,9 @@ Julia-vterm provides a major-mode for inferior Julia process that runs in vterm,
 
 ** Should I use this?
 
-There's already [[https://github.com/tpapp/julia-repl][julia-repl]]. It works well in most cases, but I sometimes encountered problems when I used a very large DataFrame, which seemed to be caused by the limited performance of term.el. Julia-vterm is implemented using emacs-libvterm, and REPL works as smoothly as in a native terminal.
+There's [[https://github.com/tpapp/julia-repl][julia-repl]]. But it had a display performance issue due to the limited performance of its backend terminal emulator, term.el. That's the reason why I made julia-vterm. Actually, julia-repl seems to have added support for vterm in January 2021, so I think one doesn't need to choose julia-vterm for display performance now.
+
+Another possible reason might be Org Babel support by [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It is still under development but you might be interested.
 
 Currently, julia-vterm offers minimum functionalities for basic interaction with the REPL. A few more functions may be added in the future, but you may want to check julia-repl if you need more features. If the simplicity of this package fits your preference, please give it a try!
 
