@@ -273,6 +273,8 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
 	  (setq default-directory buffer-directory)))
     (message "The buffer is not associated with a directory.")))
 
+(defalias 'julia-vterm-sync-wd 'julia-vterm-send-cd-to-buffer-directory)
+
 (unless (fboundp 'julia)
   (defalias 'julia 'julia-vterm-repl))
 
