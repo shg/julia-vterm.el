@@ -273,6 +273,9 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
 	  (setq default-directory buffer-directory)))
     (message "The buffer is not associated with a directory.")))
 
+(unless (fboundp 'julia)
+  (defalias 'julia 'julia-vterm-repl))
+
 ;;;###autoload
 (define-minor-mode julia-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
