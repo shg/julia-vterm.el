@@ -28,13 +28,13 @@ Then, evaluate the following add-hook line to turn on julia-vterm-mode in newly 
 You can install the package manually if necessary. First make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download =julia-vterm.el= into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
 
 #+BEGIN_SRC emacs-lisp
-(package-install-file "/path-to-download-dir/julia-vterm.el")
+(package-install-file "/path/to/julia-vterm.el")
 #+END_SRC
 
-=julia-vterm= will assume your julia executable is just =julia=, if you want to specify a different path, put
+By default, the command named =julia= in your =PATH= is used. If you want to specify a different location, add the directory to the =PATH= environment variable or set the =julia-vterm-repl-program= variable to the absolute path to the command. You can also pass parameters to the command by the variable. For example, you can use julia command in a certain path, with 4 threads enabled, by the line like the following.
 
 #+BEGIN_SRC emacs-lisp
-(setq julia-vterm-repl-program "path/to/julia")
+(setq julia-vterm-repl-program "/path/to/julia -t 4")
 #+END_SRC
 
 ** How to use
