@@ -31,6 +31,12 @@ You can install the package manually if necessary. First make sure [[https://git
 (package-install-file "/path-to-download-dir/julia-vterm.el")
 #+END_SRC
 
+=julia-vterm= will assume your julia executable is just =julia=, if you want to specify a different path, put
+
+#+BEGIN_SRC emacs-lisp
+(setq julia-vterm-repl-program "path/to/julia")
+#+END_SRC
+
 ** How to use
 
 In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Julia REPL buffer with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=).
