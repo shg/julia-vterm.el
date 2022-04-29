@@ -108,7 +108,8 @@ recreated."
     (let ((buffer (generate-new-buffer (julia-vterm-repl-buffer-name session-name)))
 	  (vterm-shell julia-vterm-repl-program))
       (with-current-buffer buffer
-	(julia-vterm-repl-mode))
+	(julia-vterm-repl-mode)
+	(add-function :filter-args (process-filter vterm--process) #'julia-vterm-repl-run-filter-functions))
       buffer)))
 
 (defun julia-vterm-repl-buffer (&optional session-name restart)
@@ -144,6 +145,18 @@ If there's already one with the process alive, just open it."
   (save-excursion
     (goto-char (point-min))
     (vterm-clear 1)))
+
+(defvar-local julia-vterm-repl-filter-functions '()
+  "List of filter functions that process the output to the REPL buffer.")
+
+(defun julia-vterm-repl-run-filter-functions (args)
+  "Run registered filter functions with ARGS."
+  (let ((proc (car args))
+	(str (cadr args)))
+    (let ((funcs julia-vterm-repl-filter-functions))
+      (while funcs
+	(setq str (apply (pop funcs) (list str))))
+      (list proc str))))
 
 (defvar julia-vterm-repl-copy-mode-map
   (let ((map (make-sparse-keymap)))
