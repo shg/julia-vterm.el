@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.13
+;; Version: 0.14
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -278,6 +278,20 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
     (message "The buffer is not associated with a directory.")))
 
 (defalias 'julia-vterm-sync-wd 'julia-vterm-send-cd-to-buffer-directory)
+
+(defun julia-vterm-fellow-repl-buffer-status ()
+  "Return REPL mode or nil if REPL is not ready for input."
+  (with-current-buffer (julia-vterm-fellow-repl-buffer)
+    (let ((tail (substring (buffer-string) -64)))
+      (set-text-properties 0 (length tail) nil tail)
+      (let* ((lines (split-string (string-trim-right tail "[\t\n\r]+")
+				  (char-to-string ?\n)))
+	     (prompt (car (last lines))))
+	(pcase prompt
+	  ("julia> " :julia)
+	  ("help?> " :help)
+	  ((rx "(@v" (1+ (in "0-9.")) ") pkg> ") :pkg)
+	  ("shell> " :shell))))))
 
 (unless (fboundp 'julia)
   (defalias 'julia 'julia-vterm-repl))
