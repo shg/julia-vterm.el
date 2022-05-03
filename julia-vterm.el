@@ -158,6 +158,18 @@ If there's already one with the process alive, just open it."
 	(setq str (apply (pop funcs) (list str))))
       (list proc str))))
 
+(defun julia-vterm-repl-buffer-status ()
+  (let ((tail (substring (buffer-string) -64)))
+    (set-text-properties 0 (length tail) nil tail)
+    (let* ((lines (split-string (string-trim-right tail "[\t\n\r]+")
+				(char-to-string ?\n)))
+	   (prompt (car (last lines))))
+      (pcase prompt
+	("julia> " :julia)
+	("help?> " :help)
+	((rx "(@v" (1+ (in "0-9.")) ") pkg> ") :pkg)
+	("shell> " :shell)))))
+
 (defvar julia-vterm-repl-copy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-t") #'julia-vterm-repl-copy-mode)
@@ -295,16 +307,7 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
 (defun julia-vterm-fellow-repl-buffer-status ()
   "Return REPL mode or nil if REPL is not ready for input."
   (with-current-buffer (julia-vterm-fellow-repl-buffer)
-    (let ((tail (substring (buffer-string) -64)))
-      (set-text-properties 0 (length tail) nil tail)
-      (let* ((lines (split-string (string-trim-right tail "[\t\n\r]+")
-				  (char-to-string ?\n)))
-	     (prompt (car (last lines))))
-	(pcase prompt
-	  ("julia> " :julia)
-	  ("help?> " :help)
-	  ((rx "(@v" (1+ (in "0-9.")) ") pkg> ") :pkg)
-	  ("shell> " :shell))))))
+    (julia-vterm-repl-buffer-status)))
 
 (unless (fboundp 'julia)
   (defalias 'julia 'julia-vterm-repl))
