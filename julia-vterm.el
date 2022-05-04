@@ -315,7 +315,9 @@ With a prefix argument ARG (or interactively C-u), use Revise.includet() instead
 ;;;###autoload
 (define-minor-mode julia-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
-  nil "⁂"
+  :init-value nil
+  :lighter "⁂"
+  :keymap
   `((,(kbd "C-c C-z") . julia-vterm-switch-to-repl-buffer)
     (,(kbd "C-<return>") . julia-vterm-send-region-or-current-line)
     (,(kbd "C-c C-b") . julia-vterm-send-buffer)
