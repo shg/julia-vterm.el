@@ -159,7 +159,8 @@ If there's already one with the process alive, just open it."
       (list proc str))))
 
 (defun julia-vterm-repl-buffer-status ()
-  (let ((tail (substring (buffer-string) -64)))
+  (let* ((bs (buffer-string))
+	 (tail (substring bs (- (min 64 (length bs))))))
     (set-text-properties 0 (length tail) nil tail)
     (let* ((lines (split-string (string-trim-right tail "[\t\n\r]+")
 				(char-to-string ?\n)))
