@@ -109,7 +109,8 @@ recreated."
 	  (vterm-shell julia-vterm-repl-program))
       (with-current-buffer buffer
 	(julia-vterm-repl-mode)
-	(add-function :filter-args (process-filter vterm--process) #'julia-vterm-repl-run-filter-functions))
+	(add-function :filter-args (process-filter vterm--process)
+		      (julia-vterm-repl-run-filter-functions-func session-name)))
       buffer)))
 
 (defun julia-vterm-repl-buffer (&optional session-name restart)
@@ -149,14 +150,16 @@ If there's already one with the process alive, just open it."
 (defvar-local julia-vterm-repl-filter-functions '()
   "List of filter functions that process the output to the REPL buffer.")
 
-(defun julia-vterm-repl-run-filter-functions (args)
-  "Run registered filter functions with ARGS."
-  (let ((proc (car args))
-	(str (cadr args)))
-    (let ((funcs julia-vterm-repl-filter-functions))
-      (while funcs
-	(setq str (apply (pop funcs) (list str))))
-      (list proc str))))
+(defun julia-vterm-repl-run-filter-functions-func (session)
+  "Return a function that runs registered filter functions for SESSION with args."
+  (lambda (args)
+    (with-current-buffer (julia-vterm-repl-buffer session)
+      (let ((proc (car args))
+	    (str (cadr args)))
+	(let ((funcs julia-vterm-repl-filter-functions))
+	  (while funcs
+	    (setq str (apply (pop funcs) (list str))))
+	  (list proc str))))))
 
 (defun julia-vterm-repl-buffer-status ()
   (let* ((bs (buffer-string))
