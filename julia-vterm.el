@@ -238,7 +238,7 @@ With prefix ARG, prompt for session name."
 		(t (read-from-minibuffer "Session name: "))))
 	 (script-buffer (current-buffer))
 	 (repl-buffer (julia-vterm-fellow-repl-buffer session-name)))
-    (setq julia-vterm-fellow-repl-buffer repl-buffer )
+    (setq julia-vterm-fellow-repl-buffer repl-buffer)
     (with-current-buffer repl-buffer
       (setq julia-vterm-repl-script-buffer script-buffer)
       (let ((display-buffer-alist '((".*"
