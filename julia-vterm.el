@@ -122,11 +122,21 @@ recreated even when a process is alive and running in the buffer."
       (julia-vterm-repl-buffer-with-session-name session-name restart)
     (julia-vterm-repl-buffer-with-session-name "main" restart)))
 
-(defun julia-vterm-repl ()
-  "Create an inferior Julia REPL buffer `*julia:main*` and open it.
-If there's already one with the process alive, just open it."
-  (interactive)
-  (pop-to-buffer-same-window (julia-vterm-repl-buffer)))
+(defun julia-vterm-repl (&optional arg)
+  "Create an inferior Julia REPL buffer and open it.
+The buffer name will be `*julia:main*` where `main` is the default session name.
+With prefix ARG, prompt for a session name.
+If there's already an alive REPL buffer for the session, it will be opened."
+  (interactive "P")
+  (let* ((session-name
+	  (cond ((null arg) nil)
+		(t (read-from-minibuffer "Session name: "))))
+	 (orig-buffer (current-buffer))
+	 (repl-buffer (julia-vterm-repl-buffer session-name)))
+    (if (and (boundp 'julia-vterm-mode) julia-vterm-mode)
+	(with-current-buffer repl-buffer
+	  (setq julia-vterm-repl-script-buffer orig-buffer)))
+    (pop-to-buffer-same-window repl-buffer)))
 
 (defun julia-vterm-repl-switch-to-script-buffer ()
   "Switch to the script buffer that is paired with this Julia REPL buffer."
