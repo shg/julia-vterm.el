@@ -7,7 +7,7 @@
 
 Julia-vterm provides a major-mode for an inferior Julia process (or REPL) that runs in vterm, and a minor-mode that extends julia-mode with the ability to interact with the inferior Julia process.
 
-The functionalities required for basic REPL interaction have been implemented. While I would like to keep this package simple, suggestions are always welcome.
+The functionalities required for typical REPL interaction have been implemented. While I would like to keep this package simple, suggestions are always welcome.
 
 If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org Babel]], please consider trying [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It uses Julia-vterm and provides a solid babel development experience with session and asynchronous execution support.
 
@@ -15,15 +15,15 @@ If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org
 
 You can install this package from MELPA. The package name is =julia-vterm=.
 
-For manual installation, download =julia-vterm.el= into somewhere in your local directory and use =package-install-file= command. Please make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and configured properly.
+For manual installation, download =julia-vterm.el= into somewhere in your local directory and use =package-install-file= command. Please make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and configured correctly.
 
-Turn on =julia-vterm-mode= in a =julia-mode= buffer to use this package. A symbol “⁂” in the mode line indicates that the julia-mode buffer is ready to interact with the julia-vterm REPL. Add the following line to your init file to automatically enable =julia-vterm-mode= in =julia-mode= buffers.
+Turn on =julia-vterm-mode= in a =julia-mode= buffer to use this package. A symbol “⁂” in the mode line indicates that the julia-mode buffer is ready to interact with the julia-vterm REPL. Add the following line to your init file to enable =julia-vterm-mode= in =julia-mode= buffers automatically.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'julia-mode-hook #'julia-vterm-mode)
 #+END_SRC
 
-By default, the command named =julia= in your =PATH= is used. You can also specify a Julia executable by setting the =julia-vterm-repl-program= variable to the absolute path to it. The variable can contain switches for the julia command. For example, you can use julia command at a certain path, with 4 threads enabled, by the line like the following.
+By default, the command named =julia= in your =PATH= is used. You can use a Julia executable in any path by setting the =julia-vterm-repl-program= variable to its absolute path. The variable can contain switches for the =julia= command. For example, you can use a =julia= executable at a certain path, with 4 threads enabled, by the line like the following.
 
 #+BEGIN_SRC emacs-lisp
 (setq julia-vterm-repl-program "/path/to/julia -t 4")
@@ -31,7 +31,9 @@ By default, the command named =julia= in your =PATH= is used. You can also speci
 
 ** How to use
 
-In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Julia REPL buffer with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=). See below for other commands.
+=M-x julia-vterm-repl= (or =M-x julia= if no other packages define it before julia-vterm is loaded) opens an inferior Julia REPL buffer.
+
+In a julia script buffer with =julia-vterm-mode= on, you can open a Julia REPL with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=). See below for other commands.
 
 ** Key bindings
 
