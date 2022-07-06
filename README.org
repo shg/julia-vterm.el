@@ -5,33 +5,25 @@
 
 * julia-vterm
 
-Julia-vterm provides a major-mode for inferior Julia process that runs in vterm, and a minor-mode that extends julia-mode with the ability to interact with the inferior Julia process.
+Julia-vterm provides a major-mode for an inferior Julia process (or REPL) that runs in vterm, and a minor-mode that extends julia-mode with the ability to interact with the inferior Julia process.
 
-** Should I use this?
+The functionalities required for basic REPL interaction have been implemented. While I would like to keep this package simple, suggestions are always welcome.
 
-There's [[https://github.com/tpapp/julia-repl][julia-repl]]. But it had a display performance issue due to the limited performance of its backend terminal emulator, term.el. That's the reason why I made julia-vterm. Actually, julia-repl seems to have added support for vterm in January 2021, so I think one doesn't need to choose julia-vterm for display performance now.
-
-Another possible reason might be Org Babel support by [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It is still under development but you might be interested.
-
-Currently, julia-vterm offers minimum functionalities for basic interaction with the REPL. A few more functions may be added in the future, but you may want to check julia-repl if you need more features. If the simplicity of this package fits your preference, please give it a try!
+If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org Babel]], please consider trying [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It uses Julia-vterm and provides a solid babel development experience with session and asynchronous execution support.
 
 ** Installation
 
-Just install it from MELPA. The package name is =julia-vterm=.
+You can install this package from MELPA. The package name is =julia-vterm=.
 
-Then, evaluate the following add-hook line to turn on julia-vterm-mode in newly opened julia-mode buffers. A symbol "⁂" in the mode line indicates that the julia-mode buffer is ready to interact with the vterm-powered Julia REPL. Add this line to your init file to enable julia-vterm-mode in future sessions.
+For manual installation, download =julia-vterm.el= into somewhere in your local directory and use =package-install-file= command. Please make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and configured properly.
+
+Turn on =julia-vterm-mode= in a =julia-mode= buffer to use this package. A symbol “⁂” in the mode line indicates that the julia-mode buffer is ready to interact with the julia-vterm REPL. Add the following line to your init file to automatically enable =julia-vterm-mode= in =julia-mode= buffers.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'julia-mode-hook #'julia-vterm-mode)
 #+END_SRC
 
-You can install the package manually if necessary. First make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and working properly. Download =julia-vterm.el= into somewhere in your local directory and install it with the following. You also need to configure the hook described above.
-
-#+BEGIN_SRC emacs-lisp
-(package-install-file "/path/to/julia-vterm.el")
-#+END_SRC
-
-By default, the command named =julia= in your =PATH= is used. If you want to specify a different location, add the directory to the =PATH= environment variable or set the =julia-vterm-repl-program= variable to the absolute path to the command. You can also pass parameters to the command by the variable. For example, you can use julia command in a certain path, with 4 threads enabled, by the line like the following.
+By default, the command named =julia= in your =PATH= is used. You can also specify a Julia executable by setting the =julia-vterm-repl-program= variable to the absolute path to it. The variable can contain switches for the julia command. For example, you can use julia command at a certain path, with 4 threads enabled, by the line like the following.
 
 #+BEGIN_SRC emacs-lisp
 (setq julia-vterm-repl-program "/path/to/julia -t 4")
@@ -39,32 +31,60 @@ By default, the command named =julia= in your =PATH= is used. If you want to spe
 
 ** How to use
 
-In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Julia REPL buffer with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=).
+In a julia script buffer with =julia-vterm-mode= on, you can open an inferior Julia REPL buffer with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=). See below for other commands.
 
 ** Key bindings
 
-*** =julia-mode= with =julia-vterm-mode= enabled
+*** julia-vterm-mode
 
-| Key        | Binding                                 |
-|------------+-----------------------------------------|
-| =C-c C-z=    | =julia-vterm-switch-to-repl-buffer=       |
-| =C-<return>= | =julia-vterm-send-region-or-current-line= |
-| =C-c C-b=    | =julia-vterm-send-buffer=                 |
-| =C-c C-i=    | =julia-vterm-send-include-buffer-file=    |
-| =C-c C-d=    | =julia-vterm-send-cd-to-buffer-directory= |
+#+begin_example
+Key         Command / Description
+------------------------------------------------------------------------------------------------
+C-c C-z     julia-vterm-switch-to-repl-buffer
+            Switch to the paired REPL buffer or to the one with a specified session name.
+            With prefix ARG, prompt for session name.
 
-*** =julia-vterm-repl-mode=
+C-<return>  julia-vterm-send-region-or-current-line
+            Send the content of the region if the region is active, or send the current line.
 
-| Key     | Binding                                  |
-|---------+------------------------------------------|
-| =C-c C-z= | =julia-vterm-repl-switch-to-script-buffer= |
-| =M-k=     | =julia-vterm-repl-clear-buffer=            |
-| =C-c C-t= | =julia-vterm-repl-copy-mode=               |
+C-c C-b     julia-vterm-send-buffer
+            Send the whole content of the script buffer to the Julia REPL line by line.
 
-*** =julia-vterm-repl-mode= (copy mode)
+C-c C-i     julia-vterm-send-include-buffer-file
+            Send a line to evaluate the buffer's file using include() to the Julia REPL.
+            With prefix ARG, Revise.includet() is used instead.
 
-| Key      | Binding                         |
-|----------+---------------------------------|
-| =C-c C-t=  | =julia-vterm-repl-copy-mode=      |
-| =<return>= | =julia-vterm-repl-copy-mode-done= |
-| =C-c C-r=  | =vterm-reset-cursor-point=        |
+C-c C-d     julia-vterm-send-cd-to-buffer-directory
+            Send cd() function call to the Julia REPL to change the current working directory of
+            REPL to the buffer's directory.
+#+end_example
+
+*** julia-vterm-repl-mode
+
+#+begin_example
+Key         Command / Description
+------------------------------------------------------------------------------------------------
+C-c C-z     julia-vterm-repl-switch-to-script-buffer
+            Switch to the script buffer that is paired with the current Julia REPL buffer.
+
+M-k         julia-vterm-repl-clear-buffer
+            Clear the content of the Julia REPL buffer.
+
+C-c C-t     julia-vterm-repl-copy-mode
+            Enter copy mode.
+#+end_example
+
+*** julia-vterm-repl-mode (copy mode)
+
+#+begin_example
+Key         Command / Description
+------------------------------------------------------------------------------------------------
+C-c C-t     julia-vterm-repl-copy-mode
+            Exit copy mode.
+
+<return>    julia-vterm-repl-copy-mode-done
+            Copy the region to the kill ring and exit copy mode.
+
+C-c C-r     vterm-reset-cursor-point
+            Call the vterm command that moves point to where it should be.
+#+end_example
