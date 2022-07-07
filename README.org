@@ -13,7 +13,7 @@ If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org
 
 ** Installation
 
-You can install this package from MELPA. The package name is =julia-vterm=.
+You can install this package from MELPA. The package name is “julia-vterm”.
 
 For manual installation, download =julia-vterm.el= into somewhere in your local directory and use =package-install-file= command. Please make sure [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] and [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] are installed and configured correctly.
 
