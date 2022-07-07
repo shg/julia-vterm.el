@@ -41,13 +41,14 @@ In a julia script buffer with =julia-vterm-mode= on, you can open a Julia REPL w
 
 #+begin_example
 Key         Command / Description
-------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 C-c C-z     julia-vterm-switch-to-repl-buffer
             Switch to the paired REPL buffer or to the one with a specified session name.
             With prefix ARG, prompt for session name.
 
 C-<return>  julia-vterm-send-region-or-current-line
-            Send the content of the region if the region is active, or send the current line.
+            Send the content of the region if the region is active, or send the current
+            line.
 
 C-c C-b     julia-vterm-send-buffer
             Send the whole content of the script buffer to the Julia REPL line by line.
@@ -57,15 +58,15 @@ C-c C-i     julia-vterm-send-include-buffer-file
             With prefix ARG, Revise.includet() is used instead.
 
 C-c C-d     julia-vterm-send-cd-to-buffer-directory
-            Send cd() function call to the Julia REPL to change the current working directory of
-            REPL to the buffer's directory.
+            Send cd() function call to the Julia REPL to change the current working
+            directory of REPL to the buffer's directory.
 #+end_example
 
 *** julia-vterm-repl-mode
 
 #+begin_example
 Key         Command / Description
-------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 C-c C-z     julia-vterm-repl-switch-to-script-buffer
             Switch to the script buffer that is paired with the current Julia REPL buffer.
 
@@ -80,7 +81,7 @@ C-c C-t     julia-vterm-repl-copy-mode
 
 #+begin_example
 Key         Command / Description
-------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 C-c C-t     julia-vterm-repl-copy-mode
             Exit copy mode.
 
