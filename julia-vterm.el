@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.18
+;; Version: 0.19
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -231,6 +231,7 @@ If there's already an alive REPL buffer for the session, it will be opened."
   :group 'julia-vterm)
 
 (defvar-local julia-vterm-fellow-repl-buffer nil)
+(defvar-local julia-vterm-session nil)
 
 (defun julia-vterm-fellow-repl-buffer (&optional session-name)
   "Return the paired REPL buffer or the one specified with SESSION-NAME."
@@ -238,7 +239,9 @@ If there's already an alive REPL buffer for the session, it will be opened."
       (julia-vterm-repl-buffer session-name)
     (if (buffer-live-p julia-vterm-fellow-repl-buffer)
 	julia-vterm-fellow-repl-buffer
-      (julia-vterm-repl-buffer))))
+      (if julia-vterm-session
+	  (julia-vterm-repl-buffer julia-vterm-session)
+	(julia-vterm-repl-buffer)))))
 
 (defun julia-vterm-switch-to-repl-buffer (&optional arg)
   "Switch to the paired REPL buffer or to the one with a specified session name.
