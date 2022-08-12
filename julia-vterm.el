@@ -125,7 +125,7 @@ recreated even when a process is alive and running in the buffer."
 
 (defun julia-vterm-repl (&optional arg)
   "Create an inferior Julia REPL buffer and open it.
-The buffer name will be `*julia:main*` where `main` is the default session name.
+The buffer name will be `*julia:main*' where `main' is the default session name.
 With prefix ARG, prompt for a session name.
 If there's already an alive REPL buffer for the session, it will be opened."
   (interactive "P")
@@ -176,6 +176,7 @@ If there's already an alive REPL buffer for the session, it will be opened."
 	  (list proc str))))))
 
 (defun julia-vterm-repl-buffer-status ()
+  "Check and return the prompt status of the REPL command input."
   (let* ((bs (buffer-string))
 	 (tail (substring bs (- (min 256 (length bs))))))
     (set-text-properties 0 (length tail) nil tail)
@@ -266,7 +267,9 @@ With prefix ARG, prompt for session name."
     (vterm-send-return)))
 
 (defun julia-vterm-paste-string (string &optional session-name)
-  "Send STRING to the Julia REPL buffer using brackted paste mode."
+  "Send STRING to the Julia REPL buffer using brackted paste mode.
+If SESSION-NAME is given, the REPL with the session name, otherwise
+the main REPL, is used."
   (with-current-buffer (julia-vterm-fellow-repl-buffer session-name)
     (vterm-send-string string t)))
 
@@ -317,7 +320,7 @@ With prefix ARG, use Revise.includet() instead."
       (message "The buffer must be saved in a file to include."))))
 
 (defun julia-vterm-send-cd-to-buffer-directory ()
-  "Send cd() function call to the Julia REPL to change the current working directory of REPL to the buffer's directory."
+  "Change the REPL's working directory to the directory of the buffer file."
   (interactive)
   (if buffer-file-name
       (let ((buffer-directory (file-name-directory buffer-file-name)))
