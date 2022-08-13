@@ -64,7 +64,7 @@
   "A major mode for inferior Julia REPL."
   :group 'julia)
 
-(defvar julia-vterm-repl-program "julia"
+(defvar-local julia-vterm-repl-program "julia"
   "Name of the command for executing Julia code.
 Maybe either a command in the path, like julia
 or an absolute path name, like /usr/local/bin/julia
