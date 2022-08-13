@@ -336,9 +336,6 @@ With prefix ARG, use Revise.includet() instead."
   (with-current-buffer (julia-vterm-fellow-repl-buffer)
     (julia-vterm-repl-buffer-status)))
 
-(unless (fboundp 'julia)
-  (defalias 'julia 'julia-vterm-repl))
-
 ;;;###autoload
 (define-minor-mode julia-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
@@ -350,6 +347,16 @@ With prefix ARG, use Revise.includet() instead."
     (,(kbd "C-c C-b") . julia-vterm-send-buffer)
     (,(kbd "C-c C-i") . julia-vterm-send-include-buffer-file)
     (,(kbd "C-c C-d") . julia-vterm-send-cd-to-buffer-directory)))
+
+
+;;----------------------------------------------------------------------
+;; Define some utility aliases but not override if the names are already used.
+(unless (fboundp 'julia)
+  (defalias 'julia 'julia-vterm-repl))
+
+(unless (boundp 'julia-session)
+  (defvaralias 'julia-session 'julia-vterm-session))
+
 
 (provide 'julia-vterm)
 
