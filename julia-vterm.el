@@ -85,8 +85,9 @@ parameters may be used, like julia -q")
   :group 'julia-vterm-repl)
 
 (defun julia-vterm-repl-buffer-name (&optional session-name)
-  "Return a Julia REPL buffer name whose session name is SESSION-NAME."
-  (format "*julia:%s*" (if session-name session-name "main")))
+  "Return a Julia REPL buffer name whose session name is SESSION-NAME.
+If SESSION-NAME is not given, the default session name `main' is assumed."
+  (format "*julia:%s*" (or session-name "main")))
 
 (defun julia-vterm-repl-session-name (repl-buffer)
   "Return the session name of REPL-BUFFER."
@@ -95,33 +96,25 @@ parameters may be used, like julia -q")
 	(substring bn 7 -1)
       nil)))
 
-(defun julia-vterm-repl-buffer-with-session-name (session-name &optional restart)
+(defun julia-vterm-repl-buffer (&optional session-name restart)
   "Return an inferior Julia REPL buffer of the session name SESSION-NAME.
 If there exists no such buffer, one is created and returned.
 With non-nil RESTART, the existing buffer will be killed and
 recreated."
-  (if-let ((buffer (get-buffer (julia-vterm-repl-buffer-name session-name)))
-	   (alive (vterm-check-proc buffer))
-	   (no-restart (not restart)))
-      buffer
-    (if (get-buffer-process buffer) (delete-process buffer))
-    (if buffer (kill-buffer buffer))
-    (let ((buffer (generate-new-buffer (julia-vterm-repl-buffer-name session-name)))
-	  (vterm-shell julia-vterm-repl-program))
-      (with-current-buffer buffer
-	(julia-vterm-repl-mode)
-	(add-function :filter-args (process-filter vterm--process)
-		      (julia-vterm-repl-run-filter-functions-func session-name)))
-      buffer)))
-
-(defun julia-vterm-repl-buffer (&optional session-name restart)
-  "Return an inferior Julia REPL buffer.
-The main REPL buffer will be returned if SESSION-NAME is not
-given.  If non-nil RESTART is given, the REPL buffer will be
-recreated even when a process is alive and running in the buffer."
-  (if session-name
-      (julia-vterm-repl-buffer-with-session-name session-name restart)
-    (julia-vterm-repl-buffer-with-session-name "main" restart)))
+  (let ((ses-name (or session-name "main")))
+    (if-let ((buffer (get-buffer (julia-vterm-repl-buffer-name ses-name)))
+	     (alive (vterm-check-proc buffer))
+	     (no-restart (not restart)))
+	buffer
+      (if (get-buffer-process buffer) (delete-process buffer))
+      (if buffer (kill-buffer buffer))
+      (let ((buffer (generate-new-buffer (julia-vterm-repl-buffer-name ses-name)))
+	    (vterm-shell julia-vterm-repl-program))
+	(with-current-buffer buffer
+	  (julia-vterm-repl-mode)
+	  (add-function :filter-args (process-filter vterm--process)
+			(julia-vterm-repl-run-filter-functions-func ses-name)))
+	buffer))))
 
 (defun julia-vterm-repl (&optional arg)
   "Create an inferior Julia REPL buffer and open it.
