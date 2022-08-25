@@ -285,13 +285,16 @@ script buffer."
 	      (newline))))))
   (forward-line))
 
+(defun julia-vterm-ensure-newline (str)
+  "Add a newline at the end of STR if the last character is not a newline."
+  (concat str (if (string= (substring str -1 nil) "\n") "" "\n")))
+
 (defun julia-vterm-send-region-or-current-line ()
   "Send the content of the region if the region is active, or send the current line."
   (interactive)
   (if (use-region-p)
-      (progn
-	(julia-vterm-paste-string
-	 (buffer-substring-no-properties (region-beginning) (region-end)))
+      (let ((str (julia-vterm-ensure-newline (buffer-substring-no-properties (region-beginning) (region-end)))))
+	(julia-vterm-paste-string str)
 	(deactivate-mark))
     (julia-vterm-send-current-line)))
 
@@ -299,7 +302,7 @@ script buffer."
   "Send the whole content of the script buffer to the Julia REPL line by line."
   (interactive)
   (save-excursion
-    (julia-vterm-paste-string (buffer-string))))
+    (julia-vterm-paste-string (julia-vterm-ensure-newline (buffer-string)))))
 
 (defun julia-vterm-send-include-buffer-file (&optional arg)
   "Send a line to evaluate the buffer's file using include() to the Julia REPL.
