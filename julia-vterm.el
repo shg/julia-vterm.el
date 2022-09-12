@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.21
+;; Version: 0.22
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -96,6 +96,14 @@ If SESSION-NAME is not given, the default session name `main' is assumed."
 	(substring bn 7 -1)
       nil)))
 
+(defun julia-vterm-repl-list-sessions ()
+  "Return a list of existing Julia REPL sessions."
+  (mapcan (lambda (bn)
+	    (if (string-match "\\*julia:\\(.*\\)\\*" bn)
+		(list (match-string 1 bn))
+	      nil))
+	  (mapcar #'buffer-name (buffer-list))))
+
 (defun julia-vterm-repl-buffer (&optional session-name restart)
   "Return an inferior Julia REPL buffer of the session name SESSION-NAME.
 If there exists no such buffer, one is created and returned.
@@ -124,7 +132,8 @@ If there's already an alive REPL buffer for the session, it will be opened."
   (interactive "P")
   (let* ((session-name
 	  (cond ((null arg) nil)
-		(t (read-from-minibuffer "Session name: "))))
+		(t (completing-read "Session name: " (julia-vterm-repl-list-sessions) nil nil nil nil
+				    (julia-vterm-repl-session-name (julia-vterm-fellow-repl-buffer))))))
 	 (orig-buffer (current-buffer))
 	 (repl-buffer (julia-vterm-repl-buffer session-name)))
     (if (and (boundp 'julia-vterm-mode) julia-vterm-mode)
@@ -240,7 +249,8 @@ With prefix ARG, prompt for session name."
   (interactive "P")
   (let* ((session-name
 	  (cond ((null arg) nil)
-		(t (read-from-minibuffer "Session name: "))))
+		(t (completing-read "Session name: " (julia-vterm-repl-list-sessions) nil nil nil nil
+				    (julia-vterm-repl-session-name (julia-vterm-fellow-repl-buffer))))))
 	 (script-buffer (current-buffer))
 	 (repl-buffer (julia-vterm-fellow-repl-buffer session-name)))
     (setq julia-vterm-fellow-repl-buffer repl-buffer)

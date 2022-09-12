@@ -35,6 +35,10 @@ By default, the command named =julia= in your =PATH= is used. You can use a Juli
 
 In a julia script buffer with =julia-vterm-mode= on, you can open a Julia REPL with =M-x julia-vterm-switch-to-repl-buffer= (or =C-c C-z=). See below for other commands.
 
+Both of the above operations open a REPL with the default session name =main=. You can specify a different session name by using the prefix argument =C-u=. A new session will be created and opened if there is no REPL with that session name.
+
+You can also specify a session name by defining a file local variable =julia-vterm-session= (or =julia-session= if no other packages pre-define it). If the variable is defined, =C-c C-z= will open a REPL with that session name.
+
 ** Key bindings
 
 *** julia-vterm-mode
