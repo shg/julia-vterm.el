@@ -340,7 +340,7 @@ With prefix ARG, use Revise.includet() instead."
 (define-minor-mode julia-vterm-mode
   "A minor mode for a Julia script buffer that interacts with an inferior Julia REPL."
   :init-value nil
-  :lighter "⁂"
+  :lighter " ⁂"
   :keymap
   `((,(kbd "C-c C-z") . julia-vterm-switch-to-repl-buffer)
     (,(kbd "C-<return>") . julia-vterm-send-region-or-current-line)
