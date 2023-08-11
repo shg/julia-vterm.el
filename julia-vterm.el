@@ -1,13 +1,13 @@
 ;;; julia-vterm.el --- A mode for Julia REPL using vterm -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2022 Shigeaki Nishina
+;; Copyright (C) 2020-2023 Shigeaki Nishina
 
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.22
+;; Version: 0.23
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -184,6 +184,7 @@ If there's already an alive REPL buffer for the session, it will be opened."
 	   (prompt (car (last lines))))
       (pcase prompt
 	("julia> " :julia)
+	((rx "In [" (one-or-more (any "0-9")) "]: ") :julia)
 	("help?> " :help)
 	((rx "(@v" (1+ (in "0-9.")) ") pkg> ") :pkg)
 	("shell> " :shell)))))
