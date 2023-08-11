@@ -9,7 +9,7 @@ Julia-vterm provides a major-mode for an inferior Julia process (or REPL) that r
 
 The functionalities required for typical REPL interaction have been implemented. While I would like to keep this package simple, suggestions are always welcome.
 
-If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org Babel]], please consider trying [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It uses Julia-vterm and provides a solid babel development experience with session and asynchronous execution support.
+If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org Babel]], please consider trying [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It uses julia-vterm and provides a solid babel development experience with session and asynchronous execution support.
 
 ** Installation
 
