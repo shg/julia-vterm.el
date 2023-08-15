@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.23
+;; Version: 0.24
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -175,7 +175,8 @@ If there's already an alive REPL buffer for the session, it will be opened."
 	  (list proc str))))))
 
 (defun julia-vterm-repl-buffer-status ()
-  "Check and return the prompt status of the REPL command input."
+  "Check and return the prompt status of the REPL.
+Return a corresponding symbol or nil if not ready for input."
   (let* ((bs (buffer-string))
 	 (tail (substring bs (- (min 256 (length bs))))))
     (set-text-properties 0 (length tail) nil tail)
@@ -183,11 +184,11 @@ If there's already an alive REPL buffer for the session, it will be opened."
 				(char-to-string ?\n)))
 	   (prompt (car (last lines))))
       (pcase prompt
-	("julia> " :julia)
-	((rx "In [" (one-or-more (any "0-9")) "]: ") :julia)
-	("help?> " :help)
-	((rx "(@v" (1+ (in "0-9.")) ") pkg> ") :pkg)
-	("shell> " :shell)))))
+	((rx bol "julia> " eol) :julia)
+	((rx bol "In [" (one-or-more (any "0-9")) "]: " eol) :julia)
+	((rx bol "help?> " eol) :help)
+	((rx bol "(" (+? any) ") pkg> " eol) :pkg)
+	((rx bol "shell> " eol) :shell)))))
 
 (defvar julia-vterm-repl-copy-mode-map
   (let ((map (make-sparse-keymap)))
