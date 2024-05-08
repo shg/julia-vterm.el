@@ -1,13 +1,13 @@
 ;;; julia-vterm.el --- A mode for Julia REPL using vterm -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2023 Shigeaki Nishina
+;; Copyright (C) 2020-2024 Shigeaki Nishina
 
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.24
+;; Version: 0.25
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -78,6 +78,7 @@ parameters may be used, like julia -q")
     (define-key map (kbd "M-k") #'julia-vterm-repl-clear-buffer)
     (define-key map (kbd "C-c C-t") #'julia-vterm-repl-copy-mode)
     (define-key map (kbd "C-l") #'recenter-top-bottom)
+    (define-key map (kbd "C-c C-r") #'julia-vterm-repl-restart)
     map))
 
 (define-derived-mode julia-vterm-repl-mode vterm-mode "Inf-Julia"
@@ -114,15 +115,32 @@ recreated."
 	     (alive (vterm-check-proc buffer))
 	     (no-restart (not restart)))
 	buffer
-      (if (get-buffer-process buffer) (delete-process buffer))
-      (if buffer (kill-buffer buffer))
-      (let ((buffer (generate-new-buffer (julia-vterm-repl-buffer-name ses-name)))
-	    (vterm-shell julia-vterm-repl-program))
-	(with-current-buffer buffer
-	  (julia-vterm-repl-mode)
-	  (add-function :filter-args (process-filter vterm--process)
-			(julia-vterm-repl-run-filter-functions-func ses-name)))
-	buffer))))
+      (if (not buffer)
+          (let ((new-buffer (generate-new-buffer (julia-vterm-repl-buffer-name ses-name)))
+	        (vterm-shell julia-vterm-repl-program))
+            (with-current-buffer new-buffer
+              (julia-vterm-repl-mode)
+              (add-function :filter-args (process-filter vterm--process)
+		            (julia-vterm-repl-run-filter-functions-func ses-name)))
+            new-buffer)
+        (save-excursion
+          (let* ((win (get-buffer-window buffer))
+                 (proc (get-buffer-process buffer))
+                 (context (if proc (julia-vterm-repl-get-context buffer))))
+            (with-current-buffer buffer
+              (rename-buffer (concat (buffer-name) ":orphaned")))
+            (let ((new-buffer (generate-new-buffer (julia-vterm-repl-buffer-name ses-name)))
+	          (vterm-shell julia-vterm-repl-program))
+              (with-current-buffer new-buffer
+                (julia-vterm-repl-mode)
+                (add-function :filter-args (process-filter vterm--process)
+		              (julia-vterm-repl-run-filter-functions-func ses-name)))
+              (when win
+                (select-window win)
+                (switch-to-buffer new-buffer))
+              (julia-vterm-repl-set-context new-buffer context)
+              (if (process-live-p proc) (delete-process proc))
+              new-buffer)))))))
 
 (defun julia-vterm-repl (&optional arg)
   "Create an inferior Julia REPL buffer and open it.
@@ -153,6 +171,12 @@ If there's already an alive REPL buffer for the session, it will be opened."
 	  (setq julia-vterm-fellow-repl-buffer repl-buffer)
 	  (switch-to-buffer-other-window script-buffer)))))
 
+(defun julia-vterm-repl-restart ()
+  "Restart the inferior Julia process in the current REPL buffer."
+  (interactive)
+  (if (y-or-n-p "Restart Julia REPL? ")
+      (julia-vterm-repl-buffer (julia-vterm-repl-session-name (current-buffer)) t)))
+
 (defun julia-vterm-repl-clear-buffer ()
   "Clear the content of the Julia REPL buffer."
   (interactive)
@@ -174,7 +198,7 @@ If there's already an alive REPL buffer for the session, it will be opened."
 	    (setq str (apply (pop funcs) (list str))))
 	  (list proc str))))))
 
-(defun julia-vterm-repl-buffer-status ()
+(defun julia-vterm-repl-prompt-status ()
   "Check and return the prompt status of the REPL.
 Return a corresponding symbol or nil if not ready for input."
   (let* ((bs (buffer-string))
@@ -189,6 +213,40 @@ Return a corresponding symbol or nil if not ready for input."
 	((rx bol "help?> " eol) :help)
 	((rx bol "(" (+? any) ") pkg> " eol) :pkg)
 	((rx bol "shell> " eol) :shell)))))
+
+(defun julia-vterm-repl-get-context (buf)
+  "Obtain context information of the REPL buffer BUF.
+This returns a list of the current working directory of the
+inferior Julia process and the current active environment."
+  (with-current-buffer buf
+    (let ((uid (random #x100000000)))
+      (vterm-send-return)
+      (julia-vterm-paste-string
+       (format (concat "\"$(string(%s, base = 16)):"
+                       "$(pwd())|#|"
+                       "$(dirname(Base.active_project()))|#|"
+                       "\"\n") uid)
+       (julia-vterm-repl-session-name buf))
+      (sleep-for 0.5)
+      (let* ((bs (buffer-string))
+	     (tail (replace-regexp-in-string (rx (or "\r\n" "\r" "\n")) ""
+                                             (substring bs (- (min 1024 (length bs)))))))
+        (set-text-properties 0 (length tail) nil tail)
+        (let* ((i0 (string-match (rx (regex (format "%x" uid)) ":") tail))
+               (i1 (string-match "|#|" tail (1+ i0)))
+               (i2 (string-match "|#|" tail (1+ i1)))
+               (wd (substring tail (+ i0 9) i1))
+               (env (substring tail (+ i1 3) i2)))
+          (list wd env julia-vterm-repl-script-buffer))))))
+
+(defun julia-vterm-repl-set-context (buf context)
+  "Restore CONTEXT information on the REPL buffer BUF."
+  (with-current-buffer buf
+    (julia-vterm-paste-string
+     (format "cd(\"%s\"); Pkg.activate(\"%s\")\n" (car context) (cadr context))
+     (julia-vterm-repl-session-name buf))
+    (setq default-directory (car context))
+    (setq julia-vterm-repl-script-buffer (caddr context))))
 
 (defvar julia-vterm-repl-copy-mode-map
   (let ((map (make-sparse-keymap)))
@@ -333,10 +391,10 @@ With prefix ARG, use Revise.includet() instead."
 
 (defalias 'julia-vterm-sync-wd 'julia-vterm-send-cd-to-buffer-directory)
 
-(defun julia-vterm-fellow-repl-buffer-status ()
+(defun julia-vterm-fellow-repl-prompt-status ()
   "Return REPL mode or nil if REPL is not ready for input."
   (with-current-buffer (julia-vterm-fellow-repl-buffer)
-    (julia-vterm-repl-buffer-status)))
+    (julia-vterm-repl-prompt-status)))
 
 ;;;###autoload
 (define-minor-mode julia-vterm-mode
