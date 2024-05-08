@@ -79,6 +79,11 @@ M-k         julia-vterm-repl-clear-buffer
 
 C-c C-t     julia-vterm-repl-copy-mode
             Enter copy mode.
+
+C-c M-r     julia-vterm-repl-restart
+            Restart the current inferior Julia process. A new Julia REPL will be opened in
+            the same Emacs window, and the working directory and environment will be
+            restored from the previous REPL process when possible.
 #+end_example
 
 *** julia-vterm-repl-mode (copy mode)
