@@ -1,13 +1,13 @@
 ;;; julia-vterm.el --- A mode for Julia REPL using vterm -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2024 Shigeaki Nishina
+;; Copyright (C) 2020-2025 Shigeaki Nishina
 
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.25
+;; Version: 0.26
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
@@ -148,10 +148,8 @@ The buffer name will be `*julia:main*' where `main' is the default session name.
 With prefix ARG, prompt for a session name.
 If there's already an alive REPL buffer for the session, it will be opened."
   (interactive "P")
-  (let* ((session-name
-	  (cond ((null arg) nil)
-		(t (completing-read "Session name: " (julia-vterm-repl-list-sessions) nil nil nil nil
-				    (julia-vterm-repl-session-name (julia-vterm-fellow-repl-buffer))))))
+  (let* ((session-name (cond ((null arg) nil)
+                             (t (julia-vterm-ask-session))))
 	 (orig-buffer (current-buffer))
 	 (repl-buffer (julia-vterm-repl-buffer session-name)))
     (if (and (boundp 'julia-vterm-mode) julia-vterm-mode)
@@ -303,20 +301,26 @@ inferior Julia process and the current active environment."
 	  (julia-vterm-repl-buffer julia-vterm-session)
 	(julia-vterm-repl-buffer)))))
 
-(defun julia-vterm-switch-to-repl-buffer (&optional arg)
-  "Switch to the paired REPL buffer or to the one with a specified session name.
-With prefix ARG, prompt for session name."
-  (interactive "P")
-  (let* ((session-name
-	  (cond ((null arg) nil)
-		(t (completing-read "Session name: " (julia-vterm-repl-list-sessions) nil nil nil nil
-				    (julia-vterm-repl-session-name (julia-vterm-fellow-repl-buffer))))))
-	 (script-buffer (current-buffer))
-	 (repl-buffer (julia-vterm-fellow-repl-buffer session-name)))
+(defun julia-vterm-ask-session ()
+  "Prompt and return a session name."
+  (completing-read "Session name: " (julia-vterm-repl-list-sessions) nil nil nil nil
+		   (julia-vterm-repl-session-name (julia-vterm-fellow-repl-buffer))))
+
+(defun julia-vterm-switch-to (repl-buffer)
+  "Switch to REPL-BUFFER and pair it with the current script buffer."
+  (let ((script-buffer (current-buffer)))
     (setq julia-vterm-fellow-repl-buffer repl-buffer)
     (with-current-buffer repl-buffer
       (setq julia-vterm-repl-script-buffer script-buffer)
       (switch-to-buffer-other-window repl-buffer))))
+
+(defun julia-vterm-switch-to-repl-buffer (&optional arg)
+  "Switch to the paired REPL buffer or to the one with a specified session name.
+With prefix ARG, prompt for session name."
+  (interactive "P")
+  (let ((session-name (cond ((null arg) nil)
+                            (t (julia-vterm-ask-session)))))
+    (julia-vterm-switch-to (julia-vterm-fellow-repl-buffer session-name))))
 
 (defun julia-vterm-send-return-key ()
   "Send a return key to the Julia REPL."
