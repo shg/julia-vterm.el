@@ -7,7 +7,7 @@
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
-;; Version: 0.26
+;; Version: 0.27
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
