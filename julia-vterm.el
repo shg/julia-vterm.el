@@ -380,17 +380,21 @@ With prefix ARG, use Revise.includet() instead."
     (if (and buffer-file-name
 	     (file-exists-p buffer-file-name)
 	     (not (buffer-modified-p)))
-	(julia-vterm-paste-string (format fmt buffer-file-name))
+	(if (eq (julia-vterm-fellow-repl-prompt-status) :julia)
+	    (julia-vterm-paste-string (format fmt buffer-file-name))
+	  (message "The REPL is not ready for input."))
       (message "The buffer must be saved in a file to include."))))
 
 (defun julia-vterm-send-cd-to-buffer-directory ()
   "Change the REPL's working directory to the directory of the buffer file."
   (interactive)
   (if buffer-file-name
-      (let ((buffer-directory (file-name-directory buffer-file-name)))
-	(julia-vterm-paste-string (format "cd(\"%s\")\n" buffer-directory))
-	(with-current-buffer (julia-vterm-fellow-repl-buffer)
-	  (setq default-directory buffer-directory)))
+      (if (eq (julia-vterm-fellow-repl-prompt-status) :julia)
+	  (let ((buffer-directory (file-name-directory buffer-file-name)))
+	    (julia-vterm-paste-string (format "cd(\"%s\")\n" buffer-directory))
+	    (with-current-buffer (julia-vterm-fellow-repl-buffer)
+	      (setq default-directory buffer-directory)))
+	(message "The REPL is not ready for input."))
     (message "The buffer is not associated with a directory.")))
 
 (defalias 'julia-vterm-sync-wd 'julia-vterm-send-cd-to-buffer-directory)
