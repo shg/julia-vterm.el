@@ -169,10 +169,11 @@ If there's already an alive REPL buffer for the session, it will be opened."
 	  (setq julia-vterm-fellow-repl-buffer repl-buffer)
 	  (switch-to-buffer-other-window script-buffer)))))
 
-(defun julia-vterm-repl-restart ()
-  "Restart the inferior Julia process in the current REPL buffer."
-  (interactive)
-  (if (y-or-n-p "Restart Julia REPL? ")
+(defun julia-vterm-repl-restart (&optional arg)
+  "Restart the inferior Julia process in the current REPL buffer.
+With prefix ARG, restart immediately without the confirmation prompt."
+  (interactive "P")
+  (if (or arg (y-or-n-p "Restart Julia REPL? "))
       (julia-vterm-repl-buffer (julia-vterm-repl-session-name (current-buffer)) t)))
 
 (defun julia-vterm-repl-clear-buffer ()
