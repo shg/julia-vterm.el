@@ -11,6 +11,8 @@ The functionalities required for typical REPL interaction have been implemented.
 
 If you want to use Julia with [[https://orgmode.org/worg/org-contrib/babel/][Org Babel]], please consider trying [[https://github.com/shg/ob-julia-vterm.el][ob-julia-vterm]]. It uses julia-vterm and provides a solid babel development experience with session and asynchronous execution support.
 
+FYI, [[https://github.com/shg/python-vterm.el][python-vterm]] and [[https://github.com/shg/ob-python-vterm.el][ob-python-vterm]] are also under development to offer a similar workflow for Python.
+
 ** Installation
 
 You can install this package from MELPA. The package name is “julia-vterm”.
