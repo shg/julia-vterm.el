@@ -217,7 +217,7 @@ Return a corresponding symbol or nil if not ready for input."
 This returns a list of the current working directory of the
 inferior Julia process and the current active environment."
   (with-current-buffer buf
-    (let ((uid (random #x100000000)))
+    (let ((uid (+ #x10000000 (random #xf0000000))))
       (vterm-send-return)
       (julia-vterm-paste-string
        (format (concat "\"$(string(%s, base = 16)):"
