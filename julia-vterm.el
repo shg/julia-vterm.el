@@ -6,7 +6,7 @@
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
-;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
+;; Package-Requires: ((emacs "26.1") (vterm "0.0.1"))
 ;; Version: 0.31
 ;; Keywords: languages, julia
 
@@ -57,6 +57,7 @@
 
 (require 'vterm)
 (require 'rx)
+(eval-when-compile (require 'subr-x))
 
 
 ;;----------------------------------------------------------------------
