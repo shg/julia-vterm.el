@@ -417,7 +417,7 @@ With numeric prefix 1, activate a temporary environment."
   (if (eq (julia-vterm-fellow-repl-prompt-status) :julia)
       (let ((cmd (cond
 		  ((null arg)
-		   (if-let ((dir (julia-vterm-project-directory)))
+		   (if-let* ((dir (julia-vterm-project-directory)))
 		       (format "using Pkg; Pkg.activate(%s)\n"
 			       (julia-vterm-julia-string dir))
 		     (user-error "No Julia project file found above default-directory")))
