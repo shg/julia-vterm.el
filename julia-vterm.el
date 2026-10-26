@@ -6,7 +6,7 @@
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
-;; Package-Requires: ((emacs "25.1") (vterm "0.0.1"))
+;; Package-Requires: ((emacs "26.1") (vterm "0.0.1"))
 ;; Version: 0.31
 ;; Keywords: languages, julia
 
@@ -57,6 +57,7 @@
 
 (require 'vterm)
 (require 'rx)
+(eval-when-compile (require 'subr-x))
 
 
 ;;----------------------------------------------------------------------
@@ -111,9 +112,9 @@ If there exists no such buffer, one is created and returned.
 With non-nil RESTART, the existing buffer will be killed and
 recreated."
   (let ((ses-name (or session-name "main")))
-    (if-let ((buffer (get-buffer (julia-vterm-repl-buffer-name ses-name)))
-	     (alive (vterm-check-proc buffer))
-	     (no-restart (not restart)))
+    (if-let* ((buffer (get-buffer (julia-vterm-repl-buffer-name ses-name)))
+	      (alive (vterm-check-proc buffer))
+	      (no-restart (not restart)))
 	buffer
       (if (not buffer)
           (let ((new-buffer (generate-new-buffer (julia-vterm-repl-buffer-name ses-name)))
@@ -417,7 +418,7 @@ With numeric prefix 1, activate a temporary environment."
   (if (eq (julia-vterm-fellow-repl-prompt-status) :julia)
       (let ((cmd (cond
 		  ((null arg)
-		   (if-let ((dir (julia-vterm-project-directory)))
+		   (if-let* ((dir (julia-vterm-project-directory)))
 		       (format "using Pkg; Pkg.activate(%s)\n"
 			       (julia-vterm-julia-string dir))
 		     (user-error "No Julia project file found above default-directory")))
