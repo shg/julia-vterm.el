@@ -1,13 +1,13 @@
 ;;; julia-vterm.el --- A mode for Julia REPL using vterm -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020-2025 Shigeaki Nishina
+;; Copyright (C) 2020-2026 Shigeaki Nishina
 
 ;; Author: Shigeaki Nishina
 ;; Maintainer: Shigeaki Nishina
 ;; Created: March 11, 2020
 ;; URL: https://github.com/shg/julia-vterm.el
 ;; Package-Requires: ((emacs "26.1") (vterm "0.0.1"))
-;; Version: 0.31
+;; Version: 0.32
 ;; Keywords: languages, julia
 
 ;; This file is not part of GNU Emacs.
