@@ -112,8 +112,8 @@ With non-nil RESTART, the existing buffer will be killed and
 recreated."
   (let ((ses-name (or session-name "main")))
     (if-let* ((buffer (get-buffer (julia-vterm-repl-buffer-name ses-name)))
-	     (alive (vterm-check-proc buffer))
-	     (no-restart (not restart)))
+	      (alive (vterm-check-proc buffer))
+	      (no-restart (not restart)))
 	buffer
       (if (not buffer)
           (let ((new-buffer (generate-new-buffer (julia-vterm-repl-buffer-name ses-name)))
